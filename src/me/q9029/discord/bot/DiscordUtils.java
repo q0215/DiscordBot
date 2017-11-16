@@ -9,7 +9,7 @@ public class DiscordUtils {
 	/**
 	 * command prefix char.
 	 */
-	public static final String BOT_PREFIX = "/";
+	public static final String BOT_PREFIX = "?";
 
 	/**
 	 * send message.

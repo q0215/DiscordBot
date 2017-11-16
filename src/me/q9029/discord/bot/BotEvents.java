@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.eclipse.jetty.util.StringUtil;
 
 import me.q9029.discord.bot.event.AbsentManageService;
 import me.q9029.discord.bot.event.impl.AbsentManageServiceImpl;
@@ -48,7 +49,7 @@ public class BotEvents {
 			List<Long> list = absentManageService.getAbsentUserList(event.getChannel().getLongID());
 
 			if (list == null || list.size() <= 0) {
-				DiscordUtils.sendMessage(event.getChannel(), "欠席する人はいないみたいだよ！");
+				DiscordUtils.sendMessage(event.getChannel(), "欠席で登録されてる人はいないゾ☆");
 				return;
 			}
 
@@ -56,9 +57,12 @@ public class BotEvents {
 			IDiscordClient cli = DiscordClientUtil.getBuiltClient();
 			for (Long userId : list) {
 				IUser user2 = cli.fetchUser(userId);
-				String nickName = user2.getNicknameForGuild(event.getGuild());
-				String userName = user2.getName();
-				messageBuilder.append(nickName).append("(").append(userName).append(") ");
+				String name = user2.getNicknameForGuild(event.getGuild());
+
+				if (StringUtil.isBlank(name)) {
+					name = user2.getName();
+				}
+				messageBuilder.append(name).append(" ");
 			}
 
 			DiscordUtils.sendMessage(event.getChannel(), messageBuilder.toString());
@@ -66,7 +70,7 @@ public class BotEvents {
 		}
 
 		// 欠席
-		if(content.startsWith(DiscordUtils.BOT_PREFIX + "欠席連絡")) {
+		if(content.startsWith(DiscordUtils.BOT_PREFIX + "欠席登録")) {
 			Long id = event.getAuthor().getLongID();
 			int result = absentManageService.absent(event.getChannel().getLongID(), id);
 			if (result == 0) {
@@ -78,7 +82,7 @@ public class BotEvents {
 		}
 
 		// 出席
-		if(content.startsWith(DiscordUtils.BOT_PREFIX + "欠席取消")) {
+		if(content.startsWith(DiscordUtils.BOT_PREFIX + "欠席削除")) {
 			Long id = event.getAuthor().getLongID();
 			int result = absentManageService.attend(event.getChannel().getLongID(), id);
 			if (result == 0) {
