@@ -7,11 +7,6 @@ import sx.blah.discord.util.RequestBuffer;
 public class DiscordUtils {
 
 	/**
-	 * command prefix char.
-	 */
-	public static final String BOT_PREFIX = "?";
-
-	/**
 	 * send message.
 	 * @param channel
 	 * @param message

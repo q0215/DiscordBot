@@ -6,14 +6,16 @@ import java.util.List;
 import org.apache.commons.lang3.time.DateUtils;
 import org.eclipse.jetty.util.StringUtil;
 
-import me.q9029.discord.bot.event.AbsentManageService;
-import me.q9029.discord.bot.event.impl.AbsentManageServiceImpl;
+import me.q9029.discord.bot.service.AbsentManageService;
+import me.q9029.discord.bot.service.impl.AbsentManageServiceImpl;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IUser;
 
 public class BotEvents {
+
+	public static final String BOT_PREFIX = "<@380778136431755264>";
 
 	private static Date createdDate = new Date();
 
@@ -32,7 +34,7 @@ public class BotEvents {
 
 		// 対象外終了
 		String content = event.getMessage().getContent();
-		if (!content.startsWith(DiscordUtils.BOT_PREFIX)) {
+		if (!content.startsWith(BOT_PREFIX)) {
 			return;
 		}
 
@@ -44,16 +46,16 @@ public class BotEvents {
 		}
 
 		// 出席確認
-		if(content.startsWith(DiscordUtils.BOT_PREFIX + "欠席確認")) {
+		if(content.startsWith(BOT_PREFIX + "欠席予定")) {
 
 			List<Long> list = absentManageService.getAbsentUserList(event.getChannel().getLongID());
 
 			if (list == null || list.size() <= 0) {
-				DiscordUtils.sendMessage(event.getChannel(), "欠席で登録されてる人はいないゾ☆");
+				DiscordUtils.sendMessage(event.getChannel(), "欠席予定はいないゾ☆");
 				return;
 			}
 
-			StringBuilder messageBuilder = new StringBuilder().append("欠席：");
+			StringBuilder messageBuilder = new StringBuilder();
 			IDiscordClient cli = DiscordClientUtil.getBuiltClient();
 			for (Long userId : list) {
 				IUser user2 = cli.fetchUser(userId);
@@ -62,33 +64,41 @@ public class BotEvents {
 				if (StringUtil.isBlank(name)) {
 					name = user2.getName();
 				}
-				messageBuilder.append(name).append(" ");
+				messageBuilder.append(name).append("さん ");
 			}
+			messageBuilder.append("が欠席予定だゾ☆");
 
 			DiscordUtils.sendMessage(event.getChannel(), messageBuilder.toString());
 			return;
 		}
 
-		// 欠席
-		if(content.startsWith(DiscordUtils.BOT_PREFIX + "欠席登録")) {
-			Long id = event.getAuthor().getLongID();
-			int result = absentManageService.absent(event.getChannel().getLongID(), id);
+		// コメント
+		Long autherId = event.getAuthor().getLongID();
+		IUser user = event.getAuthor();
+		String name = user.getNicknameForGuild(event.getGuild());
+
+		if (StringUtil.isBlank(name)) {
+			name = user.getName();
+		}
+
+		// 出席
+		if(content.startsWith(BOT_PREFIX + "出席")) {
+			int result = absentManageService.attend(event.getChannel().getLongID(), autherId);
 			if (result == 0) {
-				DiscordUtils.sendMessage(event.getChannel(), "欠席の連絡を受け付けたよ");
+				DiscordUtils.sendMessage(event.getChannel(), "欠席予定を取り消すゾ☆");
 			} else {
-				DiscordUtils.sendMessage(event.getChannel(), "すでに欠席で登録されてるよ");
+				DiscordUtils.sendMessage(event.getChannel(), "欠席予定で登録されてないゾ☆");
 			}
 			return;
 		}
 
-		// 出席
-		if(content.startsWith(DiscordUtils.BOT_PREFIX + "欠席削除")) {
-			Long id = event.getAuthor().getLongID();
-			int result = absentManageService.attend(event.getChannel().getLongID(), id);
+		// 欠席
+		if(content.startsWith(BOT_PREFIX + "欠席")) {
+			int result = absentManageService.absent(event.getChannel().getLongID(), autherId);
 			if (result == 0) {
-				DiscordUtils.sendMessage(event.getChannel(), "欠席の登録を解除したよ！");
+				DiscordUtils.sendMessage(event.getChannel(), "欠席予定で登録しておくゾ☆");
 			} else {
-				DiscordUtils.sendMessage(event.getChannel(), "欠席の連絡は受けてなかったみたいだよ");
+				DiscordUtils.sendMessage(event.getChannel(), "もう欠席予定で登録してあるゾ☆");
 			}
 			return;
 		}

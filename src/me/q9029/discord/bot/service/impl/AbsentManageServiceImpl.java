@@ -1,11 +1,11 @@
-package me.q9029.discord.bot.event.impl;
+package me.q9029.discord.bot.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.q9029.discord.bot.event.AbsentManageService;
+import me.q9029.discord.bot.service.AbsentManageService;
 
 public class AbsentManageServiceImpl implements AbsentManageService {
 

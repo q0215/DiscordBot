@@ -2,7 +2,7 @@ package me.q9029.discord.bot;
 
 import sx.blah.discord.api.IDiscordClient;
 
-public class BotMain {
+public class DiscordBotMain {
 
 	public static void main(String[] args){
 

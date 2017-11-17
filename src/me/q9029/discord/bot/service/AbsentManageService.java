@@ -1,4 +1,4 @@
-package me.q9029.discord.bot.event;
+package me.q9029.discord.bot.service;
 
 import java.util.List;
 
