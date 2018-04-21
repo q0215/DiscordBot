@@ -24,11 +24,11 @@ public class DiscordClientUtil {
 
 	/**
 	 * create client with token.
+	 * 
 	 * @param BOT_TOKEN
 	 * @return
 	 */
-	public static IDiscordClient getBuiltClient(){
+	public static IDiscordClient getBuiltClient() {
 		return client;
 	}
-
 }
