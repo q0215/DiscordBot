@@ -27,6 +27,7 @@ public class DiscordBotMain {
 			// send message.
 			List<IChannel> chList = cli.getChannels();
 			for (IChannel ch : chList) {
+				System.out.println(ch.getName());
 				if ("general".equals(ch.getName())) {
 					ch.sendMessage("【定期】装備ロック10分前");
 				}
