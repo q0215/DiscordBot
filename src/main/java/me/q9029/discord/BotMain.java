@@ -21,6 +21,13 @@ public class BotMain {
 		try {
 			logger.info("Start.");
 
+			// check args
+			if (args == null || args.length != 2) {
+				throw new RuntimeException("Missing arguments.");
+			}
+			long channelId = Long.parseLong(args[0]);
+			String message = args[1];
+
 			// get token
 			ResourceBundle bundle = ResourceBundle.getBundle("discord");
 			String token = bundle.getString("bot.token");
@@ -43,10 +50,9 @@ public class BotMain {
 				}
 
 				// send message
-				Long channelId = 0L;
 				IChannel channel = client.getChannelByID(channelId);
 				try {
-					channel.sendMessage("Hello world.");
+					channel.sendMessage(message);
 
 				} catch (MissingPermissionsException e) {
 					ICategory category = channel.getCategory();
