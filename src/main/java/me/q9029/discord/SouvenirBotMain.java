@@ -29,7 +29,7 @@ public class SouvenirBotMain {
 				client = ClientUtil.getBuiltClient(token);
 
 				// add listener
-				RoleManageLinstener listener = new RoleManageLinstener();
+				SouvenirLinstener listener = new SouvenirLinstener();
 				client.getDispatcher().registerListener(listener);
 
 				// client login
