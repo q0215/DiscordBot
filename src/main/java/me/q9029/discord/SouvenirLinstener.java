@@ -21,8 +21,22 @@ public class SouvenirLinstener {
 
 			String content = event.getMessage().getContent();
 
-			if (content != null && (content.contains("なす") || content.contains("ナス") || content.contains("茄子"))) {
+			if (content != null && (content.contains("みやび") || content.contains("ミヤビ") || content.contains("miyabi")
+					|| content.contains("ママ") || content.contains("想像") || content.contains("妊娠"))) {
+				event.getClient().getChannelByID(channelId).sendMessage(":pregnant_woman:");
+			}
+
+			if (content != null && (content.contains("なす") || content.contains("ナス") || content.contains("茄子")
+					|| content.contains("nasu"))) {
 				event.getClient().getChannelByID(channelId).sendMessage(":eggplant:");
+			}
+
+			if (content != null && content.contains("ぴち")) {
+				event.getClient().getChannelByID(channelId).sendMessage(":blowfish:");
+			}
+
+			if (content != null && content.contains("ぷんすか")) {
+				event.getClient().getChannelByID(channelId).sendMessage(":rage:");
 			}
 		}
 	}
