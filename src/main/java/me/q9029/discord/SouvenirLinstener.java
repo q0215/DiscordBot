@@ -1,6 +1,17 @@
 package me.q9029.discord;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -10,8 +21,27 @@ import sx.blah.discord.util.RateLimitException;
 
 public class SouvenirLinstener {
 
+	private static Logger logger = LoggerFactory.getLogger(SouvenirLinstener.class);
+
 	private static ResourceBundle bundle = ResourceBundle.getBundle("souvenir");
 	private static long channelId = Long.parseLong(bundle.getString("channel.id"));
+
+	private static Map<String, String> autoRespMap = new HashMap<>();
+
+	static {
+		File file = new File(bundle.getString("auto.response.csv"));
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] record = line.split(",", 0);
+				autoRespMap.put(record[0], record[1]);
+			}
+
+		} catch (Exception e) {
+			logger.error("file load error");
+		}
+	}
 
 	@EventSubscriber
 	public void onMessage(MessageReceivedEvent event)
@@ -19,25 +49,31 @@ public class SouvenirLinstener {
 
 		if (channelId == event.getChannel().getLongID()) {
 
+			long startNanoTime = System.nanoTime();
+
+			Map<Integer, String> respMap = new HashMap<>();
 			String content = event.getMessage().getContent();
 
-			if (content != null && (content.contains("みやび") || content.contains("ミヤビ") || content.contains("miyabi")
-					|| content.contains("ママ") || content.contains("想像") || content.contains("妊娠"))) {
-				event.getClient().getChannelByID(channelId).sendMessage(":pregnant_woman:");
+			for (String key : autoRespMap.keySet()) {
+
+				for (int i = 0; i < content.length(); i++) {
+
+					if (content.indexOf(key, i) != -1) {
+						respMap.put(i, autoRespMap.get(key));
+					}
+				}
 			}
 
-			if (content != null && (content.contains("なす") || content.contains("ナス") || content.contains("茄子")
-					|| content.contains("nasu"))) {
-				event.getClient().getChannelByID(channelId).sendMessage(":eggplant:");
-			}
+			List<Integer> indexList = new ArrayList<>(respMap.keySet());
+			Collections.sort(indexList);
 
-			if (content != null && content.contains("ぴち")) {
-				event.getClient().getChannelByID(channelId).sendMessage(":blowfish:");
+			StringBuilder sb = new StringBuilder();
+			for (Integer index : indexList) {
+				sb.append(respMap.get(index));
 			}
+			event.getClient().getChannelByID(channelId).sendMessage(sb.toString());
 
-			if (content != null && content.contains("ぷんすか")) {
-				event.getClient().getChannelByID(channelId).sendMessage(":rage:");
-			}
+			logger.debug(System.nanoTime() - startNanoTime + "ns elapsed");
 		}
 	}
 }
