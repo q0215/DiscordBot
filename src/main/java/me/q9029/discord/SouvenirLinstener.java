@@ -62,8 +62,9 @@ public class SouvenirLinstener {
 
 				for (int i = 0; i < content.length(); i++) {
 
-					if (content.indexOf(key, i) != -1) {
-						respMap.put(i, autoRespMap.get(key));
+					int index = content.indexOf(key, i);
+					if (index != -1 && index == i) {
+						respMap.put(index, autoRespMap.get(key));
 						logger.info("要素" + i + " " + autoRespMap.get(key));
 					}
 				}
