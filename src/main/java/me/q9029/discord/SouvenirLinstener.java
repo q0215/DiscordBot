@@ -67,15 +67,12 @@ public class SouvenirLinstener {
 
 					int index = content.indexOf(key, i);
 					if (i == index) {
-						logger.info("インデックスと一致");
 						respMap.put(i, autoRespMap.get(key));
 
 					} else if (i < index) {
-						logger.info("次のループで検出する");
 						i = index - 1;
 
 					} else {
-						logger.info("対象なし");
 						break;
 					}
 				}
