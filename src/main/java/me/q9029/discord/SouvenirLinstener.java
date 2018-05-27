@@ -39,7 +39,7 @@ public class SouvenirLinstener {
 			}
 
 		} catch (Exception e) {
-			logger.error("file load error");
+			logger.error("file load error", e);
 		}
 	}
 
