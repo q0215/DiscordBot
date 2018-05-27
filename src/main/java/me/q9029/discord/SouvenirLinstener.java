@@ -38,6 +38,10 @@ public class SouvenirLinstener {
 				autoRespMap.put(record[0], record[1]);
 			}
 
+			for (String key : autoRespMap.keySet()) {
+				logger.debug(key + " " + autoRespMap.get(key));
+			}
+
 		} catch (Exception e) {
 			logger.error("file load error", e);
 		}
@@ -60,6 +64,7 @@ public class SouvenirLinstener {
 
 					if (content.indexOf(key, i) != -1) {
 						respMap.put(i, autoRespMap.get(key));
+						logger.info("要素" + i + " " + autoRespMap.get(key));
 					}
 				}
 			}
@@ -69,6 +74,7 @@ public class SouvenirLinstener {
 
 			StringBuilder sb = new StringBuilder();
 			for (Integer index : indexList) {
+				logger.info("抽出：" + index);
 				sb.append(respMap.get(index));
 			}
 			event.getClient().getChannelByID(channelId).sendMessage(sb.toString());
