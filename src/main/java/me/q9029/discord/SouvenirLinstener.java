@@ -51,6 +51,7 @@ public class SouvenirLinstener {
 	public void onMessage(MessageReceivedEvent event)
 			throws RateLimitException, DiscordException, MissingPermissionsException {
 
+		// チャンネル制限
 		if (channelId == event.getChannel().getLongID()) {
 
 			long startNanoTime = System.nanoTime();
@@ -58,27 +59,44 @@ public class SouvenirLinstener {
 			Map<Integer, String> respMap = new HashMap<>();
 			String content = event.getMessage().getContent();
 
+			// 対象文字について
 			for (String key : autoRespMap.keySet()) {
 
+				// 文字列出現インデックスの探索
 				for (int i = 0; i < content.length(); i++) {
 
 					int index = content.indexOf(key, i);
-					if (index != -1 && index == i) {
-						respMap.put(index, autoRespMap.get(key));
-						logger.info("要素" + i + " " + autoRespMap.get(key));
+					if (i == index) {
+						logger.info("インデックスと一致");
+						respMap.put(i, autoRespMap.get(key));
+
+					} else if (i < index) {
+						logger.info("次のループで検出する");
+						i = index - 1;
+
+					} else {
+						logger.info("対象なし");
+						break;
 					}
 				}
 			}
 
-			List<Integer> indexList = new ArrayList<>(respMap.keySet());
-			Collections.sort(indexList);
+			// 対象文字１件以上
+			if (respMap.size() > 0) {
 
-			StringBuilder sb = new StringBuilder();
-			for (Integer index : indexList) {
-				logger.info("抽出：" + index);
-				sb.append(respMap.get(index));
+				// 対象文字のインデックスでソート
+				List<Integer> indexList = new ArrayList<>(respMap.keySet());
+				Collections.sort(indexList);
+
+				// 出現順で文字列組み立て
+				StringBuilder sb = new StringBuilder();
+				for (Integer index : indexList) {
+					sb.append(respMap.get(index));
+				}
+
+				// メッセージ送信
+				event.getClient().getChannelByID(channelId).sendMessage(sb.toString());
 			}
-			event.getClient().getChannelByID(channelId).sendMessage(sb.toString());
 
 			logger.debug(System.nanoTime() - startNanoTime + "ns elapsed");
 		}
