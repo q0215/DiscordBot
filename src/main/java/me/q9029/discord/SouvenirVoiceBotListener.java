@@ -33,6 +33,8 @@ public class SouvenirVoiceBotListener {
 	private static final long TEXT_CHANNEL_ID = Long.parseLong(bundle.getString("text_channnel_id"));
 	private static final long VOICE_CHANNEL_ID = Long.parseLong(bundle.getString("voice_channnel_id"));
 
+	private static Object lock = new Object();
+
 	@EventSubscriber
 	public void onReadyEvent(ReadyEvent event) {
 		IDiscordClient client = event.getClient();
@@ -50,15 +52,24 @@ public class SouvenirVoiceBotListener {
 			if (event.getChannel().getLongID() != TEXT_CHANNEL_ID) {
 				return;
 			}
+
+			IVoiceChannel voiceChannel = guild.getVoiceChannelByID(VOICE_CHANNEL_ID);
+			if (voiceChannel.getConnectedUsers() == null || voiceChannel.getConnectedUsers().size() < 2) {
+				return;
+			}
+
 			String content = message.getContent();
 			String speechContent = content.replaceAll("<.+>", "");
 			if (speechContent.isEmpty()) {
 				return;
 			}
-			IAudioManager audioManager = guild.getAudioManager();
-			AudioInputStream input = polly.synthesize(speechContent, OutputFormat.Mp3);
-			AudioInputStreamProvider provider = new AudioInputStreamProvider(input);
-			audioManager.setAudioProvider(provider);
+
+			synchronized (lock) {
+				IAudioManager audioManager = guild.getAudioManager();
+				AudioInputStream input = polly.synthesize(speechContent, OutputFormat.Mp3);
+				AudioInputStreamProvider provider = new AudioInputStreamProvider(input);
+				audioManager.setAudioProvider(provider);
+			}
 
 		} catch (IOException | UnsupportedAudioFileException e) {
 			logger.error("MessageReceivedEvent処理中に例外発生", e);
