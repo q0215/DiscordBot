@@ -77,10 +77,10 @@ public class TextToSpeachThread extends Thread {
 				audioManager.setAudioProvider(provider);
 
 				// 音声再生待機処理
-				while (input.available() > 0) {
+				while (input.available() < 1024) {
 					Thread.sleep(500);
 				}
-				Thread.sleep(1000);
+				Thread.sleep(1500);
 
 			} catch (IOException | InterruptedException e) {
 				logger.error("音声再生で例外が発生しました。", e);
