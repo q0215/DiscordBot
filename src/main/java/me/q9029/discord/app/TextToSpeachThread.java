@@ -77,7 +77,7 @@ public class TextToSpeachThread extends Thread {
 				audioManager.setAudioProvider(provider);
 
 				// 音声再生待機処理
-				while (input.available() != 0) {
+				while (input.available() > 0) {
 					Thread.sleep(500);
 				}
 				Thread.sleep(1000);
