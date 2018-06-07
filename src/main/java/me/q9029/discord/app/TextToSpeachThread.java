@@ -1,6 +1,5 @@
 package me.q9029.discord.app;
 
-import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -9,12 +8,11 @@ import javax.sound.sampled.AudioInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sx.blah.discord.handle.audio.IAudioManager;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
-import sx.blah.discord.util.audio.providers.AudioInputStreamProvider;
+import sx.blah.discord.util.audio.AudioPlayer;
 
 public class TextToSpeachThread extends Thread {
 
@@ -39,7 +37,7 @@ public class TextToSpeachThread extends Thread {
 	@Override
 	public void run() {
 
-		logger.info("thread start.");
+		logger.debug("スレッド処理開始");
 
 		// プロセス終了待機処理
 		while (true) {
@@ -47,10 +45,11 @@ public class TextToSpeachThread extends Thread {
 			// キュー待機処理
 			while (queue.size() == 0) {
 				try {
-					Thread.sleep(1000);
+					logger.debug("キュー待機");
+					TextToSpeachThread.sleep(1000);
 				} catch (InterruptedException e) {
 					// 阻害処理
-					logger.error("キュー待機処理で例外が発生しました。", e);
+					logger.error("キュー待機で例外が発生しました。", e);
 				}
 			}
 
@@ -64,26 +63,27 @@ public class TextToSpeachThread extends Thread {
 			if (voiceChannel == null) {
 				continue;
 			}
-			if (voiceChannel.getConnectedUsers().size() < 2) {
-				continue;
-			}
 
 			try {
 				voiceChannel.join();
 
-				IAudioManager audioManager = event.getGuild().getAudioManager();
-				AudioInputStream input = converter.convertToMp3(event.getMessage().getContent());
-				AudioInputStreamProvider provider = new AudioInputStreamProvider(input);
-				audioManager.setAudioProvider(provider);
+				AudioInputStream stream = converter.convertToMp3(event.getMessage().getContent());
+				AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
 
-				// 音声再生待機処理
-				while (input.available() < 1024) {
+				player.queue(stream);
+
+				while (player.getPlaylistSize() > 0) {
+					logger.info("00000");
 					Thread.sleep(500);
 				}
-				Thread.sleep(1500);
+				Thread.sleep(500);
 
-			} catch (IOException | InterruptedException e) {
-				logger.error("音声再生で例外が発生しました。", e);
+				player.clear();
+				player.clean();
+				stream.close();
+
+			} catch (Exception e) {
+				logger.error("再生で例外が発生しました。", e);
 
 			} finally {
 				voiceChannel.leave();
