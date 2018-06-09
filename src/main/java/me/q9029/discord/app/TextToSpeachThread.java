@@ -39,54 +39,61 @@ public class TextToSpeachThread extends Thread {
 
 		logger.debug("スレッド処理開始");
 
+		// 接続中ボイスチャット
+		IVoiceChannel voiceChannel = null;
+
 		// プロセス終了待機処理
 		while (true) {
 
-			// キュー待機処理
-			while (queue.size() == 0) {
-				try {
-					logger.debug("キュー待機");
-					TextToSpeachThread.sleep(1000);
-				} catch (InterruptedException e) {
-					// 阻害処理
-					logger.error("キュー待機で例外が発生しました。", e);
-				}
-			}
-
-			// キュー処理
-			MessageReceivedEvent event = queue.poll();
-
-			IGuild guild = event.getGuild();
-			IUser user = event.getAuthor();
-			IVoiceChannel voiceChannel = user.getVoiceStateForGuild(guild).getChannel();
-
-			if (voiceChannel == null) {
-				continue;
-			}
-
 			try {
-				voiceChannel.join();
+				// キュー待機処理
+				int count = 0;
+				while (queue.size() == 0) {
+					logger.debug("queue.size() == 0");
+					TextToSpeachThread.sleep(1000);
+
+					if (voiceChannel != null && count++ >= 20 && voiceChannel.isConnected()) {
+						logger.debug("voiceChannel.leave()");
+						voiceChannel.getGuild().getConnectedVoiceChannel().leave();
+						voiceChannel = null;
+					}
+				}
+
+				// キュー処理
+				MessageReceivedEvent event = queue.poll();
+
+				IGuild guild = event.getGuild();
+				IUser user = event.getAuthor();
+				voiceChannel = user.getVoiceStateForGuild(guild).getChannel();
+
+				if (voiceChannel == null) {
+					continue;
+				}
+				if (!voiceChannel.isConnected()) {
+					voiceChannel.join();
+				}
 
 				AudioInputStream stream = converter.convertToMp3(event.getMessage().getContent());
-				AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
+				try {
+					AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
+					player.queue(stream);
 
-				player.queue(stream);
+					while (player.getPlaylistSize() > 0) {
+						logger.debug("player.getPlaylistSize() > 0");
+						Thread.sleep(500);
+					}
+					Thread.sleep(1000);
 
-				while (player.getPlaylistSize() > 0) {
-					logger.info("00000");
-					Thread.sleep(500);
+				} finally {
+					if (stream != null) {
+						logger.debug("stream.close()");
+						stream.close();
+					}
 				}
-				Thread.sleep(500);
-
-				player.clear();
-				player.clean();
-				stream.close();
 
 			} catch (Exception e) {
-				logger.error("再生で例外が発生しました。", e);
-
-			} finally {
-				voiceChannel.leave();
+				// 例外を握り潰して処理継続
+				logger.error("予期せぬエラーが発生しました。", e);
 			}
 		}
 	}
