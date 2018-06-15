@@ -1,4 +1,4 @@
-package me.q9029.discord.app;
+package me.q9029.discord.app.voice;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -37,39 +37,30 @@ public class TextToSpeachThread extends Thread {
 	@Override
 	public void run() {
 
-		logger.debug("スレッド処理開始");
-
-		// 接続中ボイスチャット
-		IVoiceChannel voiceChannel = null;
-
 		// プロセス終了待機処理
 		while (true) {
 
 			try {
 				// キュー待機処理
-				int count = 0;
 				while (queue.size() == 0) {
 					logger.debug("queue.size() == 0");
-					TextToSpeachThread.sleep(1000);
-
-					if (voiceChannel != null && count++ >= 20 && voiceChannel.isConnected()) {
-						logger.debug("voiceChannel.leave()");
-						voiceChannel.getGuild().getConnectedVoiceChannel().leave();
-						voiceChannel = null;
-					}
+					Thread.sleep(1000);
 				}
 
 				// キュー処理
+				logger.info("queue.poll()");
 				MessageReceivedEvent event = queue.poll();
 
 				IGuild guild = event.getGuild();
 				IUser user = event.getAuthor();
-				voiceChannel = user.getVoiceStateForGuild(guild).getChannel();
+				IVoiceChannel voiceChannel = user.getVoiceStateForGuild(guild).getChannel();
 
 				if (voiceChannel == null) {
+					logger.info("voiceChannel == null");
 					continue;
 				}
 				if (!voiceChannel.isConnected()) {
+					logger.info("voiceChannel.join()");
 					voiceChannel.join();
 				}
 
@@ -86,14 +77,13 @@ public class TextToSpeachThread extends Thread {
 
 				} finally {
 					if (stream != null) {
-						logger.debug("stream.close()");
+						logger.info("stream.close()");
 						stream.close();
 					}
 				}
 
 			} catch (Exception e) {
-				// 例外を握り潰して処理継続
-				logger.error("予期せぬエラーが発生しました。", e);
+				logger.error("An unexpected exception occurred.", e);
 			}
 		}
 	}

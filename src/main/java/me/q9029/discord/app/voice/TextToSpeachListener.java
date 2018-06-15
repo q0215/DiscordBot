@@ -1,4 +1,4 @@
-package me.q9029.discord.app;
+package me.q9029.discord.app.voice;
 
 import java.util.ResourceBundle;
 
@@ -52,7 +52,7 @@ public class TextToSpeachListener {
 			thread.addQueue(event);
 
 		} catch (Exception e) {
-			logger.error("メッセージ受信処理で例外が発生しました。", e);
+			logger.error("An unexpected exception occurred.", e);
 		}
 	}
 }

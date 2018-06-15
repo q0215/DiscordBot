@@ -1,4 +1,4 @@
-package me.q9029.discord;
+package me.q9029.discord.app.sinoalice.service;
 
 import java.util.ResourceBundle;
 

@@ -1,4 +1,4 @@
-package me.q9029.discord;
+package me.q9029.discord.app;
 
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;

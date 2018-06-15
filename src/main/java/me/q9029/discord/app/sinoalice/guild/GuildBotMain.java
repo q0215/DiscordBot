@@ -1,41 +1,37 @@
-package me.q9029.discord;
+package me.q9029.discord.app.sinoalice.guild;
 
+import java.io.File;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.ClientUtil;
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.ICategory;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.util.MissingPermissionsException;
 
-public class BotMain {
+public class GuildBotMain {
 
-	private static Logger logger = LoggerFactory.getLogger(BotMain.class);
+	private static Logger logger = LoggerFactory.getLogger(GuildBotMain.class);
+
+	private static IDiscordClient client = null;
 
 	public static void main(String[] args) {
 
 		int exitCode = 0;
-		long startMillis = System.nanoTime();
 		try {
 			logger.info("Start.");
-
-			// check args
-			if (args == null || args.length != 2) {
-				throw new RuntimeException("Missing arguments.");
-			}
-			long channelId = Long.parseLong(args[0]);
-			String message = args[1];
 
 			// get token
 			ResourceBundle bundle = ResourceBundle.getBundle("discord");
 			String token = bundle.getString("bot.token");
 
-			IDiscordClient client = null;
 			try {
 				// create built client
 				client = ClientUtil.getBuiltClient(token);
+
+				// add listener
+				GuildLinstener listener = new GuildLinstener();
+				client.getDispatcher().registerListener(listener);
 
 				// client login
 				client.login();
@@ -49,19 +45,12 @@ public class BotMain {
 					}
 				}
 
-				// send message
-				IChannel channel = client.getChannelByID(channelId);
-				try {
-					channel.sendMessage(message);
+				File procFile = new File(bundle.getString("proc.file.path"));
+				if (procFile.createNewFile()) {
 
-				} catch (MissingPermissionsException e) {
-					ICategory category = channel.getCategory();
-					logger.warn("Missing the permission to send messages. Guild_Name:" + channel.getGuild().getName()
-							+ (category != null ? " Category_Name:" + category.getName() : "") + " Channel_Name:"
-							+ channel.getName());
-
-				} catch (Exception e) {
-					logger.error("Failed to send messages. Channel_ID:" + channelId);
+					while (procFile.exists()) {
+						Thread.sleep(1000 * 30);
+					}
 				}
 
 			} finally {
@@ -76,9 +65,7 @@ public class BotMain {
 			logger.error("An unexpected exception occurred.", e);
 
 		} finally {
-			long endMillis = System.nanoTime();
 			logger.info("End.");
-			logger.info(endMillis - startMillis + " ns elapsed.");
 		}
 
 		System.exit(exitCode);

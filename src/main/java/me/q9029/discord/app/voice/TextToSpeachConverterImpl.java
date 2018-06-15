@@ -1,4 +1,4 @@
-package me.q9029.discord.app;
+package me.q9029.discord.app.voice;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,7 +44,7 @@ public class TextToSpeachConverterImpl implements TextToSpeachConverter {
 	public AudioInputStream convertToMp3(String text) {
 
 		try {
-			logger.info("convertToMp3:" + text);
+			logger.info("Start converting " + text);
 
 			SynthesizeSpeechRequest synthReq = new SynthesizeSpeechRequest();
 			synthReq.withText(text).withVoiceId("Mizuki").withOutputFormat(OutputFormat.Mp3);
@@ -63,6 +63,8 @@ public class TextToSpeachConverterImpl implements TextToSpeachConverter {
 
 			InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
+
+			logger.info("End converting " + text);
 			return audioInputStream;
 
 		} catch (Exception e) {

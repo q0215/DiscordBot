@@ -1,4 +1,4 @@
-package me.q9029.discord;
+package me.q9029.discord.app.voice;
 
 import java.io.File;
 import java.util.ResourceBundle;
@@ -6,11 +6,12 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.ClientUtil;
 import sx.blah.discord.api.IDiscordClient;
 
-public class RoleManageMain {
+public class TextToSpeachControllerMain {
 
-	private static Logger logger = LoggerFactory.getLogger(RoleManageMain.class);
+	private static Logger logger = LoggerFactory.getLogger(TextToSpeachControllerMain.class);
 
 	private static IDiscordClient client = null;
 
@@ -21,15 +22,15 @@ public class RoleManageMain {
 			logger.info("Start.");
 
 			// get token
-			ResourceBundle bundle = ResourceBundle.getBundle("discord");
-			String token = bundle.getString("bot.token");
+			ResourceBundle bundle = ResourceBundle.getBundle("text-to-speach");
+			String token = bundle.getString("discord.token");
 
 			try {
 				// create built client
 				client = ClientUtil.getBuiltClient(token);
 
 				// add listener
-				RoleManageLinstener listener = new RoleManageLinstener();
+				TextToSpeachControllerListener listener = new TextToSpeachControllerListener();
 				client.getDispatcher().registerListener(listener);
 
 				// client login
@@ -46,12 +47,9 @@ public class RoleManageMain {
 
 				File procFile = new File(bundle.getString("proc.file.path"));
 				if (procFile.createNewFile()) {
-
 					while (procFile.exists()) {
-						Thread.sleep(1000 * 60);
+						Thread.sleep(1000 * 10);
 					}
-
-					procFile.delete();
 				}
 
 			} finally {
@@ -64,11 +62,9 @@ public class RoleManageMain {
 		} catch (Exception e) {
 			exitCode = 1;
 			logger.error("An unexpected exception occurred.", e);
-
-		} finally {
-			logger.info("End.");
 		}
 
+		logger.info("End.");
 		System.exit(exitCode);
 	}
 }

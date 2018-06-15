@@ -1,4 +1,4 @@
-package me.q9029.discord;
+package me.q9029.discord.app.voice;
 
 import java.io.File;
 import java.util.ResourceBundle;
@@ -6,11 +6,12 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.ClientUtil;
 import sx.blah.discord.api.IDiscordClient;
 
-public class SouvenirVoiceBotMain {
+public class TextToSpeachMain {
 
-	private static Logger logger = LoggerFactory.getLogger(SouvenirVoiceBotMain.class);
+	private static Logger logger = LoggerFactory.getLogger(TextToSpeachMain.class);
 
 	private static IDiscordClient client = null;
 
@@ -21,15 +22,15 @@ public class SouvenirVoiceBotMain {
 			logger.info("Start.");
 
 			// get token
-			ResourceBundle bundle = ResourceBundle.getBundle("discord");
-			String token = bundle.getString("bot.token");
+			ResourceBundle bundle = ResourceBundle.getBundle("text-to-speach");
+			String token = bundle.getString("discord.token");
 
 			try {
 				// create built client
 				client = ClientUtil.getBuiltClient(token);
 
 				// add listener
-				SouvenirVoiceBotListener listener = new SouvenirVoiceBotListener();
+				TextToSpeachListener listener = new TextToSpeachListener();
 				client.getDispatcher().registerListener(listener);
 
 				// client login
@@ -44,14 +45,13 @@ public class SouvenirVoiceBotMain {
 					}
 				}
 
-				File procFile = new File(bundle.getString("proc.file.path.souvenir.voice"));
+				TextToSpeachThread.getInstance().start();
+
+				File procFile = new File(bundle.getString("sub.proc.file.path"));
 				if (procFile.createNewFile()) {
-
 					while (procFile.exists()) {
-						Thread.sleep(1000 * 60);
+						Thread.sleep(1000);
 					}
-
-					procFile.delete();
 				}
 
 			} finally {
@@ -64,11 +64,9 @@ public class SouvenirVoiceBotMain {
 		} catch (Exception e) {
 			exitCode = 1;
 			logger.error("An unexpected exception occurred.", e);
-
-		} finally {
-			logger.info("End.");
 		}
 
+		logger.info("End.");
 		System.exit(exitCode);
 	}
 }

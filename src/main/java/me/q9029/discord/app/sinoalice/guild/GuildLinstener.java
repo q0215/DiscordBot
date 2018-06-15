@@ -1,4 +1,4 @@
-package me.q9029.discord;
+package me.q9029.discord.app.sinoalice.guild;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,9 +19,9 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RateLimitException;
 
-public class SouvenirLinstener {
+public class GuildLinstener {
 
-	private static Logger logger = LoggerFactory.getLogger(SouvenirLinstener.class);
+	private static Logger logger = LoggerFactory.getLogger(GuildLinstener.class);
 
 	private static ResourceBundle bundle = ResourceBundle.getBundle("souvenir");
 	private static long channelId = Long.parseLong(bundle.getString("channel.id"));

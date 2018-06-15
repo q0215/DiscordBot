@@ -1,4 +1,4 @@
-package me.q9029.discord;
+package me.q9029.discord.app.sinoalice.service;
 
 import java.io.File;
 import java.util.ResourceBundle;
@@ -6,11 +6,12 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.ClientUtil;
 import sx.blah.discord.api.IDiscordClient;
 
-public class SouvenirBotMain {
+public class RoleManageBotMain {
 
-	private static Logger logger = LoggerFactory.getLogger(SouvenirBotMain.class);
+	private static Logger logger = LoggerFactory.getLogger(RoleManageBotMain.class);
 
 	private static IDiscordClient client = null;
 
@@ -29,7 +30,7 @@ public class SouvenirBotMain {
 				client = ClientUtil.getBuiltClient(token);
 
 				// add listener
-				SouvenirLinstener listener = new SouvenirLinstener();
+				RoleManageLinstener listener = new RoleManageLinstener();
 				client.getDispatcher().registerListener(listener);
 
 				// client login
@@ -44,14 +45,12 @@ public class SouvenirBotMain {
 					}
 				}
 
-				File procFile = new File(bundle.getString("proc.file.path.souvenir"));
+				File procFile = new File(bundle.getString("proc.file.path"));
 				if (procFile.createNewFile()) {
 
 					while (procFile.exists()) {
-						Thread.sleep(1000 * 60);
+						Thread.sleep(1000 * 30);
 					}
-
-					procFile.delete();
 				}
 
 			} finally {
