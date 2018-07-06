@@ -1,8 +1,8 @@
-package me.q9029.discord.app.sinoalice.guild;
+package me.q9029.discord.app.text;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,24 +13,26 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.BundleConst;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RateLimitException;
 
-public class GuildLinstener {
+public class AutoResponseLinstener {
 
-	private static Logger logger = LoggerFactory.getLogger(GuildLinstener.class);
+	private static Logger logger = LoggerFactory.getLogger(AutoResponseLinstener.class);
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle("souvenir");
-	private static long channelId = Long.parseLong(bundle.getString("channel.id"));
+	private static ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
+	private static long channelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
 
 	private static Map<String, String> autoRespMap = new HashMap<>();
 
 	static {
-		File file = new File(bundle.getString("auto.response.csv"));
-		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+		String autoRespCsv = bundle.getString(BundleConst.CLASSPATH_RESP_FILE);
+		InputStream is = AutoResponseLinstener.class.getResourceAsStream(autoRespCsv);
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
 			String line;
 			while ((line = br.readLine()) != null) {

@@ -1,4 +1,4 @@
-package me.q9029.discord.app.voice;
+package me.q9029.discord.app.text;
 
 import java.io.File;
 import java.util.ResourceBundle;
@@ -6,12 +6,13 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.BundleConst;
 import me.q9029.discord.app.ClientUtil;
 import sx.blah.discord.api.IDiscordClient;
 
-public class TextToSpeachControllerMain {
+public class AutoResponseMain {
 
-	private static Logger logger = LoggerFactory.getLogger(TextToSpeachControllerMain.class);
+	private static Logger logger = LoggerFactory.getLogger(AutoResponseMain.class);
 
 	private static IDiscordClient client = null;
 
@@ -22,33 +23,33 @@ public class TextToSpeachControllerMain {
 			logger.info("Start.");
 
 			// get token
-			ResourceBundle bundle = ResourceBundle.getBundle("text-to-speach");
-			String token = bundle.getString("discord.token");
+			ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
+			String token = bundle.getString(BundleConst.TOKEN);
 
 			try {
 				// create built client
 				client = ClientUtil.getBuiltClient(token);
 
 				// add listener
-				TextToSpeachControllerListener listener = new TextToSpeachControllerListener();
+				AutoResponseLinstener listener = new AutoResponseLinstener();
 				client.getDispatcher().registerListener(listener);
 
 				// client login
 				client.login();
 
 				// wait for establishing connection
-				long readyTimeoutMillis = Long.parseLong(bundle.getString("establish.timeout")) * 1000000000;
+				long timeoutMillis = Long.parseLong(bundle.getString(BundleConst.TIMEOUT_SEC)) * 1000000000;
 				long startReadyMillis = System.nanoTime();
 				while (!client.isReady()) {
-					if (System.nanoTime() - startReadyMillis >= readyTimeoutMillis) {
+					if (System.nanoTime() - startReadyMillis >= timeoutMillis) {
 						throw new RuntimeException("The waiting time for establishing a connection has been exceeded.");
 					}
 				}
 
-				File procFile = new File(bundle.getString("proc.file.path"));
+				File procFile = new File(bundle.getString(BundleConst.PATH_PROC_FILE));
 				if (procFile.createNewFile()) {
 					while (procFile.exists()) {
-						Thread.sleep(1000 * 10);
+						Thread.sleep(1000);
 					}
 				}
 
@@ -62,9 +63,11 @@ public class TextToSpeachControllerMain {
 		} catch (Exception e) {
 			exitCode = 1;
 			logger.error("An unexpected exception occurred.", e);
+
+		} finally {
+			logger.info("End.");
 		}
 
-		logger.info("End.");
 		System.exit(exitCode);
 	}
 }

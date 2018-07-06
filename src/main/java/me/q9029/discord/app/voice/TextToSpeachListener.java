@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.BundleConst;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
@@ -12,18 +13,13 @@ public class TextToSpeachListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(TextToSpeachListener.class);
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle("text-to-speach");
-	private static final long guildId = Long.parseLong(bundle.getString("discord.guild.id"));
-	private static final long textChannelId = Long.parseLong(bundle.getString("discord.text.channel.id"));
+	private static ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
+	private static final long textChannelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
 
 		try {
-			// 対象ギルド以外は対象外
-			if (guildId != event.getGuild().getLongID()) {
-				return;
-			}
 			// 対象テキストチャンネル以外は対象外
 			if (textChannelId != event.getChannel().getLongID()) {
 				return;

@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.BundleConst;
 import me.q9029.discord.app.ClientUtil;
 import sx.blah.discord.api.IDiscordClient;
 
@@ -22,8 +23,8 @@ public class TextToSpeachMain {
 			logger.info("Start.");
 
 			// get token
-			ResourceBundle bundle = ResourceBundle.getBundle("text-to-speach");
-			String token = bundle.getString("discord.token");
+			ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
+			String token = bundle.getString(BundleConst.TOKEN);
 
 			try {
 				// create built client
@@ -37,17 +38,20 @@ public class TextToSpeachMain {
 				client.login();
 
 				// wait for establishing connection
-				long readyTimeoutMillis = Long.parseLong(bundle.getString("establish.timeout")) * 1000000000;
+				long timeoutMillis = Long.parseLong(bundle.getString(BundleConst.TIMEOUT_SEC)) * 1000000000;
 				long startReadyMillis = System.nanoTime();
 				while (!client.isReady()) {
-					if (System.nanoTime() - startReadyMillis >= readyTimeoutMillis) {
+					if (System.nanoTime() - startReadyMillis >= timeoutMillis) {
 						throw new RuntimeException("The waiting time for establishing a connection has been exceeded.");
 					}
 				}
 
+				Long channelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
+				client.getChannelByID(channelId).getGuild().getVoiceChannels().get(0).join();
+
 				TextToSpeachThread.getInstance().start();
 
-				File procFile = new File(bundle.getString("sub.proc.file.path"));
+				File procFile = new File(bundle.getString(BundleConst.PATH_PROC_FILE));
 				if (procFile.createNewFile()) {
 					while (procFile.exists()) {
 						Thread.sleep(1000);

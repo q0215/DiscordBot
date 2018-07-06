@@ -21,7 +21,6 @@ public class TextToSpeachThread extends Thread {
 	private static Queue<MessageReceivedEvent> queue = new ConcurrentLinkedQueue<>();
 
 	private static TextToSpeachThread thread = new TextToSpeachThread();
-	private TextToSpeachConverter converter = new TextToSpeachConverterImpl();
 
 	private TextToSpeachThread() {
 	}
@@ -64,7 +63,7 @@ public class TextToSpeachThread extends Thread {
 					voiceChannel.join();
 				}
 
-				AudioInputStream stream = converter.convertToMp3(event.getMessage().getContent());
+				AudioInputStream stream = TextToSpeachConverter.convertToMp3(event.getMessage().getContent());
 				try {
 					AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
 					player.queue(stream);

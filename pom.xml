@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.q9029</groupId>
 	<artifactId>discord</artifactId>
-	<version>0.0.1-RELEASE</version>
+	<version>1.0.0-RELEASE</version>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -41,9 +41,9 @@
 			<version>1.11.339</version>
 		</dependency>
 		
-		<dependency>
+ 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
+			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.25</version>
  		</dependency>
 	</dependencies>
