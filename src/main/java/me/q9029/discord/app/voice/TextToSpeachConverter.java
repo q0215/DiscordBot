@@ -30,8 +30,6 @@ public class TextToSpeachConverter {
 	private static String voiceIdJapanese;
 	private static String voiceIdEnglish;
 
-	private static final String HALF_WIDTH_WITHOUT_KANA = "^[\\uff01-\\uff60]+$";
-
 	static {
 		ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
 		String accessKey = bundle.getString(BundleConst.POLLY_ACCESS_KEY);
