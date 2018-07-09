@@ -21,4 +21,6 @@ public interface BundleConst {
 	static final String POLLY_VOCIE_ID = "polly.voice_id";
 
 	static final String POLLY_VOCIE_ID_EN = "polly.voice_id.en_US";
+
+	static final String DISCORD_TOKEN = "discord.token";
 }
