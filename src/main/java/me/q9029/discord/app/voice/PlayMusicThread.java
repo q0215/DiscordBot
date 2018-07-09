@@ -39,7 +39,8 @@ public class PlayMusicThread extends Thread {
 			DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0").withUserLocale("ja_JP").build();
 			DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 
-			IVoiceChannel voiceChannnel = client.getVoiceChannelByID(457067362730901504L);
+			Long channelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
+			IVoiceChannel voiceChannnel = client.getVoiceChannelByID(channelId);
 			AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(voiceChannnel.getGuild());
 
 			while (true) {
