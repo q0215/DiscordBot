@@ -35,7 +35,7 @@ public class PlayMusicThread extends Thread {
 
 		try {
 			ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-			String dropboxToken = bundle.getString(BundleConst.DISCORD_TOKEN);
+			String dropboxToken = bundle.getString(BundleConst.DROPBOX_TOKEN);
 			DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0").withUserLocale("ja_JP").build();
 			DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 

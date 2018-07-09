@@ -22,5 +22,5 @@ public interface BundleConst {
 
 	static final String POLLY_VOCIE_ID_EN = "polly.voice_id.en_US";
 
-	static final String DISCORD_TOKEN = "discord.token";
+	static final String DROPBOX_TOKEN = "dropbox.token";
 }
