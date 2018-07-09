@@ -46,7 +46,6 @@ public class PlayMusicThread extends Thread {
 			while (true) {
 
 				try {
-					ByteArrayOutputStream os = new ByteArrayOutputStream();
 					List<SearchMatch> matchList = dropBoxClient.files().search("", "*.mp3").getMatches();
 					for (SearchMatch data : matchList) {
 
@@ -57,6 +56,7 @@ public class PlayMusicThread extends Thread {
 
 						logger.debug(data.getMetadata().getPathDisplay());
 						voiceChannnel.join();
+						ByteArrayOutputStream os = new ByteArrayOutputStream();
 						dropBoxClient.files().downloadBuilder(data.getMetadata().getPathDisplay()).download(os);
 						os.flush();
 						byte[] byteArray = os.toByteArray();
