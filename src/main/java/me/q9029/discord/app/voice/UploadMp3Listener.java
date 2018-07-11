@@ -24,7 +24,6 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.UploadUploader;
 
 import me.q9029.discord.app.BundleConst;
-import me.q9029.discord.app.text.SendMessageMain;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;
@@ -75,7 +74,7 @@ public class UploadMp3Listener {
 						UploadUploader uploader = dropBoxClient.files().upload("/" + System.nanoTime() + ".mp3");
 						uploader.uploadAndFinish(in);
 
-						SendMessageMain.main(new String[] { channelId, attachment.getFilename() + "のアップロードが完了しました。" });
+						event.getChannel().sendMessage(attachment.getFilename() + "のアップロードが完了しました。");
 					}
 
 				} catch (IOException | DbxException | NoSuchAlgorithmException | KeyManagementException e) {
