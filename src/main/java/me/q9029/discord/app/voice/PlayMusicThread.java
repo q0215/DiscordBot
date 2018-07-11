@@ -2,6 +2,7 @@ package me.q9029.discord.app.voice;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -47,6 +48,7 @@ public class PlayMusicThread extends Thread {
 
 				try {
 					List<SearchMatch> matchList = dropBoxClient.files().search("", "*.mp3").getMatches();
+					Collections.shuffle(matchList);
 					for (SearchMatch data : matchList) {
 
 						while (player.getPlaylistSize() > 0) {

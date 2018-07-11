@@ -10,6 +10,8 @@ public interface BundleConst {
 
 	static final String CHANNEL_ID = "channel_id";
 
+	static final String UPLOAD_CHANNEL_ID = "upload_channel_id";
+
 	static final String PATH_PROC_FILE = "path.proc_file";
 
 	static final String CLASSPATH_RESP_FILE = "classpath.resp_file";

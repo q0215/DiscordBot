@@ -29,6 +29,10 @@ public class PlayMusicMain {
 				// create built client
 				client = ClientUtil.getBuiltClient(token);
 
+				// add listener
+				UploadMp3Listener listener = new UploadMp3Listener();
+				client.getDispatcher().registerListener(listener);
+
 				// client login
 				client.login();
 
