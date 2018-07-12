@@ -51,11 +51,6 @@ public class PlayMusicThread extends Thread {
 					Collections.shuffle(matchList);
 					for (SearchMatch data : matchList) {
 
-						while (player.getPlaylistSize() > 0) {
-							logger.debug("player.getPlaylistSize() > 0");
-							Thread.sleep(500);
-						}
-
 						logger.debug(data.getMetadata().getPathDisplay());
 						voiceChannnel.join();
 						ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -65,7 +60,21 @@ public class PlayMusicThread extends Thread {
 						os.close();
 
 						AudioInputStream stream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(byteArray));
-						player.queue(stream);
+						try {
+							player.queue(stream);
+
+							while (player.getPlaylistSize() > 0) {
+								logger.debug("player.getPlaylistSize() > 0");
+								Thread.sleep(500);
+							}
+							Thread.sleep(1000);
+
+						} finally {
+							if (stream != null) {
+								logger.info("stream.close()");
+								stream.close();
+							}
+						}
 					}
 
 				} catch (Exception e) {

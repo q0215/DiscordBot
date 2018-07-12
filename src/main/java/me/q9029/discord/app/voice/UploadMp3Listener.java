@@ -37,7 +37,7 @@ public class UploadMp3Listener {
 	private static final String channelId = bundle.getString(BundleConst.UPLOAD_CHANNEL_ID);
 
 	@EventSubscriber
-	public synchronized void onMessageReceivedEvent(MessageReceivedEvent event) {
+	public void onMessageReceivedEvent(MessageReceivedEvent event) {
 
 		logger.debug("Start.");
 		if (!channelId.equals(event.getChannel().getStringID())) {
@@ -85,7 +85,8 @@ public class UploadMp3Listener {
 		logger.debug("End.");
 	}
 
-	class NonAuthentication implements X509TrustManager {
+	private class NonAuthentication implements X509TrustManager {
+
 		@Override
 		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		}
