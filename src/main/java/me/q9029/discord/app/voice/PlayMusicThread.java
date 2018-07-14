@@ -2,6 +2,7 @@ package me.q9029.discord.app.voice;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -38,43 +39,47 @@ public class PlayMusicThread extends Thread {
 			ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
 			String dropboxToken = bundle.getString(BundleConst.DROPBOX_TOKEN);
 			DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0").withUserLocale("ja_JP").build();
-			DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 
 			Long channelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
 			IVoiceChannel voiceChannnel = client.getVoiceChannelByID(channelId);
-			AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(voiceChannnel.getGuild());
 
 			while (true) {
 
 				try {
+					logger.info("Search mp3.");
+					DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 					List<SearchMatch> matchList = dropBoxClient.files().search("", "*.mp3").getMatches();
 					Collections.shuffle(matchList);
+
 					for (SearchMatch data : matchList) {
 
-						logger.debug(data.getMetadata().getPathDisplay());
+						logger.info("Start " + data.getMetadata().getPathDisplay());
+						logger.info("Join voice channel.");
 						voiceChannnel.join();
-						ByteArrayOutputStream os = new ByteArrayOutputStream();
-						dropBoxClient.files().downloadBuilder(data.getMetadata().getPathDisplay()).download(os);
-						os.flush();
-						byte[] byteArray = os.toByteArray();
-						os.close();
 
-						AudioInputStream stream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(byteArray));
-						try {
+						logger.info("Get mp3 from dropbox.");
+						byte[] byteArray = null;
+						try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+							dropBoxClient.files().downloadBuilder(data.getMetadata().getPathDisplay()).download(os);
+							os.flush();
+							byteArray = os.toByteArray();
+						}
+
+						logger.info("Play mp3 in discord.");
+						try (InputStream is = new ByteArrayInputStream(byteArray);
+								AudioInputStream stream = AudioSystem.getAudioInputStream(is)) {
+
+							AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(voiceChannnel.getGuild());
 							player.queue(stream);
 
+							logger.info("Wait for the end of stream.");
 							while (player.getPlaylistSize() > 0) {
 								logger.debug("player.getPlaylistSize() > 0");
 								Thread.sleep(500);
 							}
 							Thread.sleep(1000);
-
-						} finally {
-							if (stream != null) {
-								logger.info("stream.close()");
-								stream.close();
-							}
 						}
+						logger.info("End " + data.getMetadata().getPathDisplay());
 					}
 
 				} catch (Exception e) {

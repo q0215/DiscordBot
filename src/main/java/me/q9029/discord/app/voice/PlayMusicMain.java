@@ -45,7 +45,8 @@ public class PlayMusicMain {
 					}
 				}
 
-				new PlayMusicThread(client).start();
+				PlayMusicThread thread = new PlayMusicThread(client);
+				thread.start();
 
 				File procFile = new File(bundle.getString(BundleConst.PATH_PROC_FILE));
 				if (procFile.createNewFile()) {
