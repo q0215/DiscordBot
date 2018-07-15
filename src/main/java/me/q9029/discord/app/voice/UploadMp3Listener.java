@@ -1,10 +1,7 @@
 package me.q9029.discord.app.voice;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -18,7 +15,6 @@ import javax.net.ssl.X509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.UploadUploader;
@@ -39,50 +35,62 @@ public class UploadMp3Listener {
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
 
-		logger.debug("Start.");
+		logger.info("Start.");
+
+		// 対象チャンネル以外は除外
 		if (!channelId.equals(event.getChannel().getStringID())) {
 			return;
 		}
 
+		// botは対象外
+		if (event.getAuthor().isBot()) {
+			return;
+		}
+
+		// メッセージから添付ファイルのリスト取得
 		IMessage message = event.getMessage();
 		List<Attachment> attachmentList = message.getAttachments();
 
 		for (Attachment attachment : attachmentList) {
 
-			logger.debug(attachment.getFilename());
-			if (attachment.getFilename().contains("mp3")) {
+			logger.info(attachment.getFilename());
 
-				try {
-					logger.debug(attachment.getUrl());
-					SSLContext ctx = SSLContext.getInstance("TLS");
-					ctx.init(null, new NonAuthentication[] { new NonAuthentication() }, null);
-					SSLSocketFactory factory = ctx.getSocketFactory();
+			// mp3ファイル以外は対象外
+			if (!attachment.getFilename().contains("mp3")) {
+				continue;
+			}
 
-					URL url = new URL(attachment.getUrl());
-					HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-					conn.setSSLSocketFactory(factory);
-					conn.setRequestProperty("User-agent", "Mozilla/5.0");
+			try {
+				logger.info(attachment.getUrl());
+				SSLContext ctx = SSLContext.getInstance("TLS");
+				ctx.init(null, new NonAuthentication[] { new NonAuthentication() }, null);
+				SSLSocketFactory factory = ctx.getSocketFactory();
+				URL url = new URL(attachment.getUrl());
+				HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+				conn.setSSLSocketFactory(factory);
+				conn.setRequestProperty("User-agent", "Mozilla/5.0");
 
-					try (InputStream in = conn.getInputStream()) {
+				ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
+				String dropboxToken = bundle.getString(BundleConst.DROPBOX_TOKEN);
+				DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0").withUserLocale("ja_JP")
+						.build();
+				DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 
-						ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-						String dropboxToken = bundle.getString(BundleConst.DROPBOX_TOKEN);
-						DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0")
-								.withUserLocale("ja_JP").build();
-						DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
+				UploadUploader uploader = dropBoxClient.files().upload("/" + System.nanoTime() + ".mp3");
 
-						UploadUploader uploader = dropBoxClient.files().upload("/" + System.nanoTime() + ".mp3");
-						uploader.uploadAndFinish(in);
+				try (InputStream in = conn.getInputStream()) {
 
-						event.getChannel().sendMessage(attachment.getFilename() + "のアップロードが完了しました。");
-					}
-
-				} catch (IOException | DbxException | NoSuchAlgorithmException | KeyManagementException e) {
-					logger.error("", e);
+					uploader.uploadAndFinish(in);
+					logger.info("Complete to upload " + attachment.getUrl());
+					event.getChannel().sendMessage(attachment.getUrl() + "のアップロードが完了しました。");
 				}
+
+			} catch (Exception e) {
+				logger.error("Failed to upload " + attachment.getUrl(), e);
+				event.getChannel().sendMessage(attachment.getUrl() + "のアップロードに失敗しました。");
 			}
 		}
-		logger.debug("End.");
+		logger.info("End.");
 	}
 
 	private class NonAuthentication implements X509TrustManager {

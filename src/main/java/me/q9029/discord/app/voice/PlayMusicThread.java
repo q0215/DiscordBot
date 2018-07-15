@@ -45,14 +45,14 @@ public class PlayMusicThread extends Thread {
 
 			while (true) {
 
-				try {
-					logger.info("Search mp3.");
-					DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
-					List<SearchMatch> matchList = dropBoxClient.files().search("", "*.mp3").getMatches();
-					Collections.shuffle(matchList);
+				logger.info("Search mp3.");
+				DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
+				List<SearchMatch> matchList = dropBoxClient.files().search("", "*.mp3").getMatches();
+				Collections.shuffle(matchList);
 
-					for (SearchMatch data : matchList) {
+				for (SearchMatch data : matchList) {
 
+					try {
 						logger.info("Start " + data.getMetadata().getPathDisplay());
 						logger.info("Join voice channel.");
 						voiceChannnel.join();
@@ -77,13 +77,12 @@ public class PlayMusicThread extends Thread {
 								logger.debug("player.getPlaylistSize() > 0");
 								Thread.sleep(500);
 							}
-							Thread.sleep(1000);
 						}
 						logger.info("End " + data.getMetadata().getPathDisplay());
-					}
 
-				} catch (Exception e) {
-					logger.error("", e);
+					} catch (Exception e) {
+						logger.error("Failed to play " + data.getMetadata().getPathDisplay(), e);
+					}
 				}
 			}
 		} catch (Exception e) {
