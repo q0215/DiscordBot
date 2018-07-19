@@ -2,10 +2,9 @@ package me.q9029.discord.app.voice;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -18,6 +17,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.SearchMatch;
 
 import me.q9029.discord.app.BundleConst;
+import me.q9029.discord.app.ResourceBundleUtil;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.audio.AudioPlayer;
@@ -36,52 +36,60 @@ public class PlayMusicThread extends Thread {
 	public void run() {
 
 		try {
-			ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-			String dropboxToken = bundle.getString(BundleConst.DROPBOX_TOKEN);
+			String dropboxToken = ResourceBundleUtil.getString(BundleConst.DROPBOX_TOKEN);
 			DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0").withUserLocale("ja_JP").build();
+			DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 
-			Long channelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
+			Long channelId = Long.parseLong(ResourceBundleUtil.getString(BundleConst.CHANNEL_ID));
 			IVoiceChannel voiceChannnel = client.getVoiceChannelByID(channelId);
+			AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(voiceChannnel.getGuild());
 
 			while (true) {
 
 				logger.info("Search mp3.");
-				DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 				List<SearchMatch> matchList = dropBoxClient.files().search("", "*.mp3").getMatches();
-				Collections.shuffle(matchList);
-
+				List<String> playList = new ArrayList<>();
 				for (SearchMatch data : matchList) {
+					playList.add(data.getMetadata().getPathDisplay());
+				}
+				matchList.clear();
+				matchList = null;
+
+				Collections.shuffle(playList);
+
+				for (String path : playList) {
 
 					try {
-						logger.info("Start " + data.getMetadata().getPathDisplay());
+						logger.info("Start " + path);
 						logger.info("Join voice channel.");
 						voiceChannnel.join();
 
 						logger.info("Get mp3 from dropbox.");
 						byte[] byteArray = null;
 						try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-							dropBoxClient.files().downloadBuilder(data.getMetadata().getPathDisplay()).download(os);
+							dropBoxClient.files().downloadBuilder(path).download(os);
 							os.flush();
 							byteArray = os.toByteArray();
 						}
 
 						logger.info("Play mp3 in discord.");
-						try (InputStream is = new ByteArrayInputStream(byteArray);
-								AudioInputStream stream = AudioSystem.getAudioInputStream(is)) {
+						player.clean();
 
-							AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(voiceChannnel.getGuild());
+						try (AudioInputStream stream = AudioSystem
+								.getAudioInputStream(new ByteArrayInputStream(byteArray))) {
+
 							player.queue(stream);
 
 							logger.info("Wait for the end of stream.");
 							while (player.getPlaylistSize() > 0) {
 								logger.debug("player.getPlaylistSize() > 0");
-								Thread.sleep(500);
+								Thread.sleep(1000);
 							}
 						}
-						logger.info("End " + data.getMetadata().getPathDisplay());
+						logger.info("End " + path);
 
 					} catch (Exception e) {
-						logger.error("Failed to play " + data.getMetadata().getPathDisplay(), e);
+						logger.error("Failed to play " + path, e);
 					}
 				}
 			}
