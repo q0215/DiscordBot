@@ -36,7 +36,7 @@ public class PlayMusicThread extends Thread {
 	public void run() {
 
 		try {
-			while (client.isReady()) {
+			while (!client.isReady()) {
 				Thread.sleep(1000);
 			}
 
@@ -46,7 +46,6 @@ public class PlayMusicThread extends Thread {
 
 			Long channelId = Long.parseLong(ResourceBundleUtil.getString(BundleConst.CHANNEL_ID));
 			IVoiceChannel voiceChannnel = client.getVoiceChannelByID(channelId);
-			voiceChannnel.join();
 			AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(voiceChannnel.getGuild());
 
 			while (true) {
@@ -66,6 +65,9 @@ public class PlayMusicThread extends Thread {
 
 					try {
 						logger.info("Start " + path);
+						logger.info("Join voice channel.");
+						voiceChannnel.join();
+
 						logger.info("Get mp3 from dropbox.");
 						byte[] byteArray = null;
 						try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
