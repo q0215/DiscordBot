@@ -37,6 +37,7 @@ public class PlayMusicThread extends Thread {
 
 		try {
 			while (!client.isReady()) {
+				logger.debug("client.isReady() == false");
 				Thread.sleep(1000);
 			}
 
@@ -67,6 +68,10 @@ public class PlayMusicThread extends Thread {
 						logger.info("Start " + path);
 						logger.info("Join voice channel.");
 						voiceChannnel.join();
+						while (!voiceChannnel.isConnected()) {
+							logger.debug("voiceChannnel.isConnected() == false");
+							Thread.sleep(1000);
+						}
 
 						logger.info("Get mp3 from dropbox.");
 						byte[] byteArray = null;
@@ -77,8 +82,6 @@ public class PlayMusicThread extends Thread {
 						}
 
 						logger.info("Play mp3 in discord.");
-						player.clean();
-
 						try (AudioInputStream stream = AudioSystem
 								.getAudioInputStream(new ByteArrayInputStream(byteArray))) {
 
