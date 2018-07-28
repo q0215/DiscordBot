@@ -25,4 +25,8 @@ public interface BundleConst {
 	static final String POLLY_VOCIE_ID_EN = "polly.voice_id.en_US";
 
 	static final String DROPBOX_TOKEN = "dropbox.token";
+
+	static final String MICROSOFTTRANSLATOR_KEY = "microsofttranslator.key";
+
+	static final String MICROSOFTTRANSLATOR_LANG = "microsofttranslator.lang";
 }
