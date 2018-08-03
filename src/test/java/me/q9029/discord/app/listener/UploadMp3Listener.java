@@ -1,11 +1,10 @@
-package me.q9029.discord.app.voice;
+package me.q9029.discord.app.listener;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -19,7 +18,7 @@ import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.UploadUploader;
 
-import me.q9029.discord.app.common.BundleConst;
+import me.q9029.discord.app.common.DiscordPropsUtil;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IMessage;
@@ -29,8 +28,7 @@ public class UploadMp3Listener {
 
 	private static final Logger logger = LoggerFactory.getLogger(UploadMp3Listener.class);
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-	private static final String channelId = bundle.getString(BundleConst.UPLOAD_CHANNEL_ID);
+	private static final String channelId = DiscordPropsUtil.getString(DiscordPropsUtil.Key.UPLOAD_CHANNEL_ID);
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
@@ -70,8 +68,7 @@ public class UploadMp3Listener {
 				conn.setSSLSocketFactory(factory);
 				conn.setRequestProperty("User-agent", "Mozilla/5.0");
 
-				ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-				String dropboxToken = bundle.getString(BundleConst.DROPBOX_TOKEN);
+				String dropboxToken = DiscordPropsUtil.getString(DiscordPropsUtil.Key.DROPBOX_TOKEN);
 				DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0").withUserLocale("ja_JP")
 						.build();
 				DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);

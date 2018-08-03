@@ -1,4 +1,4 @@
-package me.q9029.discord.app.voice;
+package me.q9029.discord.app.thread;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,7 +16,7 @@ import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.SearchMatch;
 
-import me.q9029.discord.app.common.BundleConst;
+import me.q9029.discord.app.common.DiscordClientUtil;
 import me.q9029.discord.app.common.DiscordPropsUtil;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IVoiceChannel;
@@ -26,11 +26,7 @@ public class PlayMusicThread extends Thread {
 
 	private static final Logger logger = LoggerFactory.getLogger(PlayMusicThread.class);
 
-	private IDiscordClient client;
-
-	public PlayMusicThread(IDiscordClient client) {
-		this.client = client;
-	}
+	private IDiscordClient client = DiscordClientUtil.getClient();
 
 	@Override
 	public void run() {
@@ -41,11 +37,11 @@ public class PlayMusicThread extends Thread {
 				Thread.sleep(1000);
 			}
 
-			String dropboxToken = DiscordPropsUtil.getString(BundleConst.DROPBOX_TOKEN);
+			String dropboxToken = DiscordPropsUtil.getString(DiscordPropsUtil.Key.DROPBOX_TOKEN);
 			DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0").withUserLocale("ja_JP").build();
 			DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 
-			Long channelId = Long.parseLong(DiscordPropsUtil.getString(BundleConst.CHANNEL_ID));
+			Long channelId = Long.parseLong(DiscordPropsUtil.getString(DiscordPropsUtil.Key.VOICE_CHANNEL_ID));
 			IVoiceChannel voiceChannnel = client.getVoiceChannelByID(channelId);
 			AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(voiceChannnel.getGuild());
 

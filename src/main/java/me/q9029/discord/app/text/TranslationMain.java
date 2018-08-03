@@ -6,13 +6,13 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.BundleConst;
-import me.q9029.discord.app.ClientUtil;
+import me.q9029.discord.app.common.BundleConst;
+import me.q9029.discord.app.common.ClientUtil;
 import sx.blah.discord.api.IDiscordClient;
 
-public class TransrationMain {
+public class TranslationMain {
 
-	private static Logger logger = LoggerFactory.getLogger(TransrationMain.class);
+	private static Logger logger = LoggerFactory.getLogger(TranslationMain.class);
 
 	private static IDiscordClient client = null;
 
@@ -31,7 +31,7 @@ public class TransrationMain {
 				client = ClientUtil.getBuiltClient(token);
 
 				// add listener
-				TransrationLinstener listener = new TransrationLinstener();
+				TranslationLinstener listener = new TranslationLinstener();
 				client.getDispatcher().registerListener(listener);
 
 				// client login

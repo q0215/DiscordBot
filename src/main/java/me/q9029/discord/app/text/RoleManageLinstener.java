@@ -2,7 +2,7 @@ package me.q9029.discord.app.text;
 
 import java.util.ResourceBundle;
 
-import me.q9029.discord.app.BundleConst;
+import me.q9029.discord.app.common.BundleConst;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;

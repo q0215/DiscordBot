@@ -1,4 +1,4 @@
-package me.q9029.discord.app.text;
+package me.q9029.discord.app.service;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -6,22 +6,32 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import com.google.gson.Gson;
 
-import me.q9029.discord.app.BundleConst;
+import me.q9029.discord.app.common.DiscordPropsUtil;
 
-public class TransrationService {
+public class TranslationService {
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-	private static String key = bundle.getString(BundleConst.MICROSOFTTRANSLATOR_KEY);
-	private static String lang = bundle.getString(BundleConst.MICROSOFTTRANSLATOR_LANG);
-	private static String host = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=" + lang;
+	private static final String key;
+	private static final String host;
 
-	private String Post(URL url, String content) throws Exception {
+	static {
+		String lang = DiscordPropsUtil.getString(DiscordPropsUtil.Key.MICROSOFTTRANSLATOR_LANG);
+
+		host = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=" + lang;
+		key = DiscordPropsUtil.getString(DiscordPropsUtil.Key.MICROSOFTTRANSLATOR_KEY);
+	}
+
+	public String translate(String text) throws Exception {
+
+		URL url = new URL(host);
+
+		List<RequestBody> objList = new ArrayList<>();
+		objList.add(new RequestBody(text));
+		String content = new Gson().toJson(objList);
 
 		HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
 		connection.setRequestMethod("POST");
@@ -50,22 +60,11 @@ public class TransrationService {
 		return response.toString();
 	}
 
-	public String Translate(String text) throws Exception {
-
-		URL url = new URL(host);
-
-		List<RequestBody> objList = new ArrayList<>();
-		objList.add(new RequestBody(text));
-		String content = new Gson().toJson(objList);
-
-		return Post(url, content);
-	}
-
-	public class RequestBody {
+	private class RequestBody {
 
 		private String text;
 
-		public RequestBody(String text) {
+		private RequestBody(String text) {
 			this.setText(text);
 		}
 

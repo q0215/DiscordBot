@@ -1,9 +1,8 @@
-package me.q9029.discord.app.voice;
+package me.q9029.discord.app.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ResourceBundle;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -20,7 +19,7 @@ import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechRequest;
 import com.amazonaws.services.polly.model.SynthesizeSpeechResult;
 
-import me.q9029.discord.app.common.BundleConst;
+import me.q9029.discord.app.common.DiscordPropsUtil;
 
 public class TextToSpeachConverter {
 
@@ -31,11 +30,10 @@ public class TextToSpeachConverter {
 	private static String voiceIdEnglish;
 
 	static {
-		ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-		String accessKey = bundle.getString(BundleConst.POLLY_ACCESS_KEY);
-		String secretKey = bundle.getString(BundleConst.POLLY_SECRET_KEY);
-		voiceIdJapanese = bundle.getString(BundleConst.POLLY_VOCIE_ID);
-		voiceIdEnglish = bundle.getString(BundleConst.POLLY_VOCIE_ID_EN);
+		String accessKey = DiscordPropsUtil.getString(DiscordPropsUtil.Key.POLLY_ACCESS_KEY);
+		String secretKey = DiscordPropsUtil.getString(DiscordPropsUtil.Key.POLLY_SECRET_KEY);
+		voiceIdJapanese = DiscordPropsUtil.getString(DiscordPropsUtil.Key.POLLY_VOCIE_ID);
+		voiceIdEnglish = DiscordPropsUtil.getString(DiscordPropsUtil.Key.POLLY_VOCIE_ID_EN);
 
 		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 		AWSStaticCredentialsProvider provider = new AWSStaticCredentialsProvider(credentials);

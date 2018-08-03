@@ -5,8 +5,8 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.BundleConst;
-import me.q9029.discord.app.ClientUtil;
+import me.q9029.discord.app.common.BundleConst;
+import me.q9029.discord.app.common.ClientUtil;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.ICategory;
 import sx.blah.discord.handle.obj.IChannel;

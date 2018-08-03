@@ -1,4 +1,4 @@
-package me.q9029.discord.app;
+package me.q9029.discord.app.common;
 
 public interface BundleConst {
 

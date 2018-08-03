@@ -1,8 +1,8 @@
-package me.q9029.discord.app;
+package me.q9029.discord.app.common;
 
 import java.util.ResourceBundle;
 
-public class ResourceBundleUtil {
+public class DiscordPropsUtil {
 
 	private static final ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
 

@@ -1,11 +1,10 @@
-package me.q9029.discord.app.voice;
-
-import java.util.ResourceBundle;
+package me.q9029.discord.app.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.common.BundleConst;
+import me.q9029.discord.app.common.DiscordPropsUtil;
+import me.q9029.discord.app.thread.TextToSpeachThread;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
@@ -13,8 +12,8 @@ public class TextToSpeachListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(TextToSpeachListener.class);
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-	private static final long textChannelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
+	private static final long textChannelId = Long
+			.parseLong(DiscordPropsUtil.getString(DiscordPropsUtil.Key.CHANNEL_ID));
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {

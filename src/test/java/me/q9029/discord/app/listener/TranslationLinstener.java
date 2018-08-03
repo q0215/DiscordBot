@@ -1,25 +1,23 @@
-package me.q9029.discord.app.text;
-
-import java.util.ResourceBundle;
+package me.q9029.discord.app.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.BundleConst;
+import me.q9029.discord.app.common.DiscordPropsUtil;
+import me.q9029.discord.app.service.TranslationService;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RateLimitException;
 
-public class TransrationLinstener {
+public class TranslationLinstener {
 
-	private static Logger logger = LoggerFactory.getLogger(TransrationLinstener.class);
+	private static Logger logger = LoggerFactory.getLogger(TranslationLinstener.class);
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-	private static long channelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
+	private static long channelId = Long.parseLong(DiscordPropsUtil.getString(DiscordPropsUtil.Key.CHANNEL_ID));
 
-	private static TransrationService service = new TransrationService();
+	private static TranslationService service = new TranslationService();
 
 	@EventSubscriber
 	public void onMessage(MessageReceivedEvent event)
@@ -45,7 +43,7 @@ public class TransrationLinstener {
 			try {
 				logger.info(content);
 
-				String json = service.Translate(content);
+				String json = service.translate(content);
 
 				int startIndex = json.indexOf("\"text\":");
 				int endIndex = json.indexOf("\",\"to\"", startIndex);

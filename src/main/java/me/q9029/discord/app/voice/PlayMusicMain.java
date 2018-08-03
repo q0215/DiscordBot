@@ -5,9 +5,9 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.BundleConst;
-import me.q9029.discord.app.ClientUtil;
-import me.q9029.discord.app.ResourceBundleUtil;
+import me.q9029.discord.app.common.BundleConst;
+import me.q9029.discord.app.common.ClientUtil;
+import me.q9029.discord.app.common.DiscordPropsUtil;
 import sx.blah.discord.api.IDiscordClient;
 
 public class PlayMusicMain {
@@ -21,7 +21,7 @@ public class PlayMusicMain {
 			logger.info("Start.");
 
 			// create process file
-			File procFile = new File(ResourceBundleUtil.getString(BundleConst.PATH_PROC_FILE));
+			File procFile = new File(DiscordPropsUtil.getString(BundleConst.PATH_PROC_FILE));
 			if (!procFile.createNewFile()) {
 				throw new RuntimeException("Failed to create process file.");
 			}
@@ -29,7 +29,7 @@ public class PlayMusicMain {
 			IDiscordClient client = null;
 			try {
 				// create built client
-				client = ClientUtil.getBuiltClient(ResourceBundleUtil.getString(BundleConst.TOKEN));
+				client = ClientUtil.getBuiltClient(DiscordPropsUtil.getString(BundleConst.TOKEN));
 
 				// client login
 				client.login();
