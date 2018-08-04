@@ -1,10 +1,10 @@
-package me.q9029.discord.app.common;
+package me.q9029.discord.app.util;
 
 import java.util.ResourceBundle;
 
 public class DiscordPropsUtil {
 
-	private static final ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
+	private static final ResourceBundle bundle = ResourceBundle.getBundle("discord");
 
 	public static String getString(String key) {
 		return bundle.getString(key);

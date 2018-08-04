@@ -11,7 +11,9 @@ import javax.net.ssl.HttpsURLConnection;
 
 import com.google.gson.Gson;
 
-import me.q9029.discord.app.common.DiscordPropsUtil;
+import me.q9029.discord.app.common.DiscordProps;
+import me.q9029.discord.app.common.MicrosoftTranslatorRequest;
+import me.q9029.discord.app.util.DiscordPropsUtil;
 
 public class TranslationService {
 
@@ -19,18 +21,20 @@ public class TranslationService {
 	private static final String host;
 
 	static {
-		String lang = DiscordPropsUtil.getString(DiscordPropsUtil.Key.MICROSOFTTRANSLATOR_LANG);
+		String lang = DiscordPropsUtil.getString(DiscordProps.Translation.TRANSLATOR_LANG);
 
 		host = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=" + lang;
-		key = DiscordPropsUtil.getString(DiscordPropsUtil.Key.MICROSOFTTRANSLATOR_KEY);
+		key = DiscordPropsUtil.getString(DiscordProps.Translation.TRANSLATOR_KEY);
 	}
 
 	public String translate(String text) throws Exception {
 
 		URL url = new URL(host);
 
-		List<RequestBody> objList = new ArrayList<>();
-		objList.add(new RequestBody(text));
+		List<MicrosoftTranslatorRequest> objList = new ArrayList<>();
+		MicrosoftTranslatorRequest request = new MicrosoftTranslatorRequest();
+		request.setText(text);
+		objList.add(request);
 		String content = new Gson().toJson(objList);
 
 		HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -58,22 +62,5 @@ public class TranslationService {
 		}
 
 		return response.toString();
-	}
-
-	private class RequestBody {
-
-		private String text;
-
-		private RequestBody(String text) {
-			this.setText(text);
-		}
-
-		public String getText() {
-			return text;
-		}
-
-		public void setText(String text) {
-			this.text = text;
-		}
 	}
 }

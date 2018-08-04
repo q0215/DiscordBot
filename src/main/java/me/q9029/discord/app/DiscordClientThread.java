@@ -6,8 +6,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.common.DiscordClientUtil;
-import me.q9029.discord.app.common.DiscordPropsUtil;
+import me.q9029.discord.app.common.DiscordProps;
+import me.q9029.discord.app.common.Interruptible;
+import me.q9029.discord.app.util.DiscordClientUtil;
+import me.q9029.discord.app.util.DiscordPropsUtil;
 import sx.blah.discord.api.IDiscordClient;
 
 /**
@@ -44,16 +46,17 @@ public class DiscordClientThread extends Thread {
 			client.login();
 
 			// スレッドの開始
-			String threadClassName = DiscordPropsUtil.getString(DiscordPropsUtil.Key.THREADS);
-			for (String key : threadClassName.split(",")) {
+			String threads = DiscordPropsUtil.getString(DiscordProps.THREADS);
+			for (String key : threads.split(",")) {
 				Class<?> clazz = Class.forName(DiscordPropsUtil.getString(key));
 				Thread thread = (Thread) clazz.newInstance();
+				threadList.add(thread);
 				thread.start();
 			}
 
 			// リスナーの追加
-			String className = DiscordPropsUtil.getString(DiscordPropsUtil.Key.LISTENERS);
-			for (String key : className.split(",")) {
+			String listeners = DiscordPropsUtil.getString(DiscordProps.LISTENERS);
+			for (String key : listeners.split(",")) {
 				Class<?> clazz = Class.forName(DiscordPropsUtil.getString(key));
 				Object listener = clazz.newInstance();
 				listenerList.add(listener);
@@ -66,15 +69,17 @@ public class DiscordClientThread extends Thread {
 					Thread.sleep(1000);
 				}
 			} catch (InterruptedException e) {
-				logger.info("Detected an interruption.");
+				logger.info("Detected an interruption.", e);
 			}
 
 			// リスナーの登録解除
 			for (Object listener : listenerList) {
 				client.getDispatcher().unregisterListener(listener);
-			}
 
-			// リスナー所有の子スレッドの終了待機
+				if (listener instanceof Interruptible) {
+					((Interruptible) listener).interrupt();
+				}
+			}
 
 			// スレッドの終了処理
 			for (Thread thread : threadList) {

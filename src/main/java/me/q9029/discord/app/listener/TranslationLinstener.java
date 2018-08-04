@@ -3,8 +3,9 @@ package me.q9029.discord.app.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.common.DiscordPropsUtil;
+import me.q9029.discord.app.common.DiscordProps;
 import me.q9029.discord.app.service.TranslationService;
+import me.q9029.discord.app.util.DiscordPropsUtil;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.DiscordException;
@@ -15,7 +16,7 @@ public class TranslationLinstener {
 
 	private static Logger logger = LoggerFactory.getLogger(TranslationLinstener.class);
 
-	private static long channelId = Long.parseLong(DiscordPropsUtil.getString(DiscordPropsUtil.Key.CHANNEL_ID));
+	private static long channelId = Long.parseLong(DiscordPropsUtil.getString(DiscordProps.Translation.CHANNEL_ID));
 
 	private static TranslationService service = new TranslationService();
 

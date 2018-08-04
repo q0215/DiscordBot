@@ -1,20 +1,27 @@
-package me.q9029.discord.app.voice;
-
-import java.util.ResourceBundle;
+package me.q9029.discord.app.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.common.BundleConst;
+import me.q9029.discord.app.common.DiscordProps;
+import me.q9029.discord.app.common.Interruptible;
+import me.q9029.discord.app.thread.TextToSpeachThread;
+import me.q9029.discord.app.util.DiscordPropsUtil;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
-public class TextToSpeachListener {
+public class TextToSpeachListener implements Interruptible {
 
 	private static final Logger logger = LoggerFactory.getLogger(TextToSpeachListener.class);
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle(BundleConst.BASE_NAME);
-	private static final long textChannelId = Long.parseLong(bundle.getString(BundleConst.CHANNEL_ID));
+	private static final long textChannelId = Long
+			.parseLong(DiscordPropsUtil.getString(DiscordProps.TextToSpeach.CHANNEL_ID));
+
+	private static TextToSpeachThread thread = TextToSpeachThread.getInstance();
+
+	public TextToSpeachListener() {
+		thread.run();
+	}
 
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
@@ -44,11 +51,20 @@ public class TextToSpeachListener {
 				return;
 			}
 
-			TextToSpeachThread thread = TextToSpeachThread.getInstance();
 			thread.addQueue(event);
 
 		} catch (Exception e) {
 			logger.error("An unexpected exception occurred.", e);
+		}
+	}
+
+	@Override
+	public void interrupt() {
+		thread.interrupt();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			logger.error("", e);
 		}
 	}
 }

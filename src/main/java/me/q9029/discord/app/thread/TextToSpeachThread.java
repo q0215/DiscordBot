@@ -1,4 +1,4 @@
-package me.q9029.discord.app.voice;
+package me.q9029.discord.app.thread;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.q9029.discord.app.service.TextToSpeachConverter;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
@@ -18,9 +19,9 @@ public class TextToSpeachThread extends Thread {
 
 	private static final Logger logger = LoggerFactory.getLogger(TextToSpeachThread.class);
 
-	private static Queue<MessageReceivedEvent> queue = new ConcurrentLinkedQueue<>();
-
 	private static TextToSpeachThread thread = new TextToSpeachThread();
+
+	private Queue<MessageReceivedEvent> queue = new ConcurrentLinkedQueue<>();
 
 	private TextToSpeachThread() {
 	}
@@ -63,8 +64,8 @@ public class TextToSpeachThread extends Thread {
 					voiceChannel.join();
 				}
 
-				AudioInputStream stream = TextToSpeachConverter.convertToMp3(event.getMessage().getContent());
-				try {
+				try (AudioInputStream stream = TextToSpeachConverter.convertToMp3(event.getMessage().getContent())) {
+
 					AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
 					player.queue(stream);
 
@@ -74,11 +75,6 @@ public class TextToSpeachThread extends Thread {
 					}
 					Thread.sleep(1000);
 
-				} finally {
-					if (stream != null) {
-						logger.info("stream.close()");
-						stream.close();
-					}
 				}
 
 			} catch (Exception e) {

@@ -5,7 +5,8 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.q9029.discord.app.common.DiscordPropsUtil;
+import me.q9029.discord.app.common.DiscordProps;
+import me.q9029.discord.app.util.DiscordPropsUtil;
 
 /**
  * アプリケーションの開始および終了の起点となるクラス。
@@ -23,7 +24,7 @@ public class DiscordAppMain {
 
 		try {
 			// プロセスファイルの作成
-			File procFile = new File(DiscordPropsUtil.getString(DiscordPropsUtil.Key.PATH_PROC_FILE));
+			File procFile = new File(DiscordPropsUtil.getString(DiscordProps.PROC_FILE));
 			if (!procFile.createNewFile()) {
 				throw new RuntimeException("Other processes exist.");
 			}
