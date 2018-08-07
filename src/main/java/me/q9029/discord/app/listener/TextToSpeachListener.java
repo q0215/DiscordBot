@@ -20,7 +20,7 @@ public class TextToSpeachListener implements Interruptible {
 	private static TextToSpeachThread thread = TextToSpeachThread.getInstance();
 
 	public TextToSpeachListener() {
-		thread.run();
+		thread.start();
 	}
 
 	@EventSubscriber

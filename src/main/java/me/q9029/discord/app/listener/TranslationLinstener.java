@@ -41,6 +41,11 @@ public class TranslationLinstener {
 				return;
 			}
 
+			// 半角文字のみの場合は対象外
+			if (content.length() == content.getBytes().length) {
+				return;
+			}
+
 			try {
 				logger.info(content);
 

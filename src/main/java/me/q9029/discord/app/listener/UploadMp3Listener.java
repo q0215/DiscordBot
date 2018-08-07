@@ -32,8 +32,6 @@ public class UploadMp3Listener {
 	@EventSubscriber
 	public void onMessageReceivedEvent(MessageReceivedEvent event) {
 
-		logger.info("Start.");
-
 		// 対象チャンネル以外は除外
 		if (!channelId.equals(event.getChannel().getStringID())) {
 			return;
@@ -48,42 +46,52 @@ public class UploadMp3Listener {
 		IMessage message = event.getMessage();
 		List<Attachment> attachmentList = message.getAttachments();
 
+		// 添付ファイルがない場合は対象外
+		if (attachmentList == null || attachmentList.size() == 0) {
+			return;
+		}
+
+		logger.info("Start.");
 		for (Attachment attachment : attachmentList) {
 
-			logger.info(attachment.getFilename());
+			// ファイル名の取得
+			String fileName = attachment.getFilename();
+			logger.info(fileName);
 
 			// mp3ファイル以外は対象外
-			if (!attachment.getFilename().contains("mp3")) {
+			if (!fileName.contains("mp3")) {
 				continue;
 			}
 
+			// 添付ファイルのURL取得
+			String url = attachment.getUrl();
+			logger.info(url);
+
 			try {
-				logger.info(attachment.getUrl());
+				// HTTPS通信の開始
+				HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
+				conn.setRequestProperty("User-agent", "Mozilla/5.0");
 				SSLContext ctx = SSLContext.getInstance("TLS");
 				ctx.init(null, new NoX509TrustManager[] { new NoX509TrustManager() }, null);
 				SSLSocketFactory factory = ctx.getSocketFactory();
-				URL url = new URL(attachment.getUrl());
-				HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 				conn.setSSLSocketFactory(factory);
-				conn.setRequestProperty("User-agent", "Mozilla/5.0");
 
 				String dropboxToken = DiscordPropsUtil.getString(DiscordProps.UploadMp3.DROPBOX_TOKEN);
 				DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("java/1.0.0").withUserLocale("ja_JP")
 						.build();
 				DbxClientV2 dropBoxClient = new DbxClientV2(requestConfig, dropboxToken);
 
-				UploadUploader uploader = dropBoxClient.files().upload("/" + System.nanoTime() + ".mp3");
-
-				try (InputStream in = conn.getInputStream()) {
-
-					uploader.uploadAndFinish(in);
-					logger.info("Complete to upload " + attachment.getUrl());
-					event.getChannel().sendMessage(attachment.getUrl() + "のアップロードが完了しました。");
+				try (UploadUploader uploader = dropBoxClient.files().upload("/" + System.nanoTime() + ".mp3")) {
+					try (InputStream in = conn.getInputStream()) {
+						uploader.uploadAndFinish(in);
+						logger.info("Complete to upload " + url);
+						event.getChannel().sendMessage(url + "のアップロードが完了しました。");
+					}
 				}
 
 			} catch (Exception e) {
-				logger.error("Failed to upload " + attachment.getUrl(), e);
-				event.getChannel().sendMessage(attachment.getUrl() + "のアップロードに失敗しました。");
+				logger.error("Failed to upload " + url, e);
+				event.getChannel().sendMessage(url + "のアップロードに失敗しました。");
 			}
 		}
 		logger.info("End.");

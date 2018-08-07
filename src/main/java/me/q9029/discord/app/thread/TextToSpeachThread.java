@@ -21,6 +21,8 @@ public class TextToSpeachThread extends Thread {
 
 	private static TextToSpeachThread thread = new TextToSpeachThread();
 
+	private boolean isInterrupted = false;
+
 	private Queue<MessageReceivedEvent> queue = new ConcurrentLinkedQueue<>();
 
 	private TextToSpeachThread() {
@@ -37,8 +39,10 @@ public class TextToSpeachThread extends Thread {
 	@Override
 	public void run() {
 
+		logger.info("Start.");
+
 		// プロセス終了待機処理
-		while (true) {
+		while (!isInterrupted) {
 
 			try {
 				// キュー待機処理
@@ -77,9 +81,20 @@ public class TextToSpeachThread extends Thread {
 
 				}
 
+			} catch (InterruptedException e) {
+				logger.info("Detected an interruption.", e);
+
 			} catch (Exception e) {
 				logger.error("An unexpected exception occurred.", e);
 			}
 		}
+
+		logger.info("End.");
+	}
+
+	@Override
+	public void interrupt() {
+		super.interrupt();
+		isInterrupted = true;
 	}
 }

@@ -27,10 +27,14 @@ public class PlayMusicThread extends Thread {
 
 	private static final Logger logger = LoggerFactory.getLogger(PlayMusicThread.class);
 
-	private IDiscordClient client = DiscordClientUtil.getClient();
+	private boolean isInterrupted = false;
+
+	private IDiscordClient client = DiscordClientUtil.getInstance();
 
 	@Override
 	public void run() {
+
+		logger.info("Start.");
 
 		try {
 			while (!client.isReady()) {
@@ -46,7 +50,7 @@ public class PlayMusicThread extends Thread {
 			IVoiceChannel voiceChannnel = client.getVoiceChannelByID(channelId);
 			AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(voiceChannnel.getGuild());
 
-			while (true) {
+			while (!isInterrupted) {
 
 				logger.info("Search mp3.");
 				List<SearchMatch> matchList = dropBoxClient.files().search("", "*.mp3").getMatches();
@@ -60,6 +64,10 @@ public class PlayMusicThread extends Thread {
 				Collections.shuffle(playList);
 
 				for (String path : playList) {
+
+					if (isInterrupted) {
+						throw new InterruptedException();
+					}
 
 					try {
 						logger.info("Start " + path);
@@ -97,8 +105,20 @@ public class PlayMusicThread extends Thread {
 					}
 				}
 			}
+
+		} catch (InterruptedException e) {
+			logger.info("Detected an interruption.", e);
+
 		} catch (Exception e) {
 			logger.error("An unexpected exception occurred.", e);
 		}
+
+		logger.info("End.");
+	}
+
+	@Override
+	public void interrupt() {
+		super.interrupt();
+		isInterrupted = true;
 	}
 }

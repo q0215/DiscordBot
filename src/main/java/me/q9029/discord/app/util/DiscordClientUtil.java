@@ -1,15 +1,27 @@
 package me.q9029.discord.app.util;
 
-import me.q9029.discord.app.common.DiscordProps;
-import sx.blah.discord.api.ClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import sx.blah.discord.api.IDiscordClient;
 
 public class DiscordClientUtil {
 
-	private static IDiscordClient client = new ClientBuilder().withToken(DiscordPropsUtil.getString(DiscordProps.TOKEN))
-			.build();
+	private static Logger logger = LoggerFactory.getLogger(DiscordClientUtil.class);
 
-	public static IDiscordClient getClient() {
+	private static IDiscordClient client;
+
+	private DiscordClientUtil() {
+	}
+
+	public static IDiscordClient getInstance() {
+
+		logger.info("Get current Instance.");
+
+		if (client == null) {
+			client = DiscordClientFactory.newInstance();
+		}
+
 		return client;
 	}
 }

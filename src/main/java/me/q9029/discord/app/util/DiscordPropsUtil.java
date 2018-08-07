@@ -6,6 +6,9 @@ public class DiscordPropsUtil {
 
 	private static final ResourceBundle bundle = ResourceBundle.getBundle("discord");
 
+	private DiscordPropsUtil() {
+	}
+
 	public static String getString(String key) {
 		return bundle.getString(key);
 	}
